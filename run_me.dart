@@ -13,8 +13,8 @@ Future<Process> runUnitTests() {
   );
 }
 
-Future<Process> runIntegrationTest() {
-  return Process.start(
+Future<Process> runIntegrationTest() async {
+  final process = Process.start(
     'flutter',
     [
       'drive',
@@ -24,4 +24,5 @@ Future<Process> runIntegrationTest() {
     runInShell: true,
     mode: ProcessStartMode.inheritStdio,
   );
+  return process;
 }
