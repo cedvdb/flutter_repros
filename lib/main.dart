@@ -24,6 +24,28 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return const ScaledCard(
+      key: ValueKey('tap-me'),
+    );
+  }
+}
+
+class ScaledCard extends StatelessWidget {
+  const ScaledCard({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedScale(
+      scale: 1.05,
+      duration: const Duration(seconds: 1),
+      child: Card(
+        child: InkWell(
+          onTap: () {},
+          child: const Text('tap me'),
+        ),
+      ),
+    );
   }
 }
