@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:phone_form_field/phone_form_field.dart';
-import 'package:pinput/pinput.dart';
 import 'package:rxdart/rxdart.dart';
 
 void main() {
@@ -39,9 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(
         builder: (ctx) => Scaffold(
           appBar: AppBar(),
-          body: const Pinput(
+          body: TextFormField(
             autofocus: true,
-            showCursor: true,
           ),
         ),
       ),
@@ -76,14 +73,5 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
     );
-  }
-}
-
-class FormView extends StatelessWidget {
-  const FormView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return PhoneFormField(autofocus: true);
   }
 }
