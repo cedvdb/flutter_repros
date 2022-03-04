@@ -12,6 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  pinput: ^2.0.4
+  rxdart: ^0.27.3
+  phone_form_field: ^4.5.1
 
 dev_dependencies:
   flutter_test:
