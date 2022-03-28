@@ -48,8 +48,6 @@ class AuthHelper {
   }
 
   Future<String> retrieveSmsCode() async {
-    // wait for emulator to have time to generate code
-    await Future.delayed(const Duration(seconds: 1));
     final Uri endpoint = Uri(
       scheme: 'http',
       host: '10.0.2.2', // android or localhost for other platforms
@@ -62,6 +60,7 @@ class AuthHelper {
       throw response.body;
     }
     Map body = jsonDecode(response.body);
+    print(body);
     final code = body['verificationCodes'].last['code'];
     return code;
   }
