@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_repros/auth_service.dart';
 import 'package:flutter_repros/auth_state.dart';
+import 'package:flutter_repros/firebase_options.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart' as http;
 
@@ -47,11 +48,14 @@ class AuthHelper {
   }
 
   Future<String> retrieveSmsCode() async {
+    // wait for emulator to have time to generate code
+    await Future.delayed(const Duration(seconds: 1));
     final Uri endpoint = Uri(
       scheme: 'http',
       host: '10.0.2.2', // android or localhost for other platforms
       port: 9099,
-      path: 'emulator/v1/projects/cowork-331520/verificationCodes',
+      path:
+          'emulator/v1/projects/${DefaultFirebaseOptions.android.projectId}/verificationCodes',
     );
     final response = await http.get(endpoint);
     if (response.statusCode != 200) {

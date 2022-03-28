@@ -21,14 +21,15 @@ class TestApp extends StatelessWidget {
                 return Container();
               }
               final state = snap.data!;
+              print(state);
               if (state is Unauthenticated) {
-                ElevatedButton(
+                return ElevatedButton(
                   onPressed: () => authHelper.signIn(),
                   child: const Text('sign in'),
                 );
               }
-              if (state is Unauthenticated) {
-                ElevatedButton(
+              if (state is Authenticated) {
+                return ElevatedButton(
                   onPressed: () => authHelper.signOut(),
                   child: const Text('sign out'),
                 );
