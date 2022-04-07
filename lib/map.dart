@@ -29,9 +29,6 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
 
   final double _defaultPickedLocationZoom = 14.4746;
 
-  late GoogleMapController _mapController;
-  bool _isMapCreated = false;
-
   LatLng? _position;
 
   @override
@@ -39,15 +36,6 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
     super.initState();
 
     _position = initialPosition;
-  }
-
-  @override
-  void dispose() {
-    if (_isMapCreated) {
-      _mapController.dispose();
-    }
-
-    super.dispose();
   }
 
   void _updatePosition(LatLng newPosition) {
@@ -79,27 +67,15 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
     };
   }
 
+  void _onMapCreated(GoogleMapController controller) {
+    controller.setMapStyle(null);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
       initialCameraPosition: _defaultPosition,
-      onMapCreated: (GoogleMapController controller) {
-        if (mounted) {
-          setState(() {
-            _mapController = controller;
-            _isMapCreated = true;
-
-            if (_position != null) {
-              controller.animateCamera(CameraUpdate.newCameraPosition(
-                CameraPosition(
-                  target: _position!,
-                  zoom: _defaultPickedLocationZoom,
-                ),
-              ));
-            }
-          });
-        }
-      },
+      onMapCreated: _onMapCreated,
       markers: _getMarkers(),
       onTap: (LatLng? location) {
         if (!readOnly && _position == null && location != null) {
