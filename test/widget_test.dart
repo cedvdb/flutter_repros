@@ -6,11 +6,16 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_repros/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // make the test hang so we can ctrl + c
-    await Future.delayed(const Duration(seconds: 1));
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
+    expect(find.textContaining('1'), findsNothing);
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('1'), findsOneWidget);
   });
 }
