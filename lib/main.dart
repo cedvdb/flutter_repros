@@ -24,6 +24,24 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return const Another();
+  }
+}
+
+
+abstract class Special extends StatelessWidget {
+  const Special({ Key? key }) : super(key: key);
+
+}
+
+
+class Another extends Special {
+  const Another({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      
+    );
   }
 }
