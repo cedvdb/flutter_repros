@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_repros/overlay_button.dart';
 import 'package:flutter_repros/themes.dart';
 
 void main() {
@@ -131,30 +132,40 @@ class MyHomePage extends StatelessWidget {
         onPressed: () {},
         child: const Icon(Icons.add),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
-          Card(
-            child: SizedBox(
-              height: 300,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: const Text('elevated'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Card(
+                child: SizedBox(
+                  height: 300,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text('elevated'),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      OutlinedButton(
+                        onPressed: () {},
+                        child: const Text('outlined'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  OutlinedButton(
-                    onPressed: () {},
-                    child: const Text('outlined'),
-                  ),
-                ],
-              ),
-            ),
-          )
+                ),
+              )
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 40),
+            child: OverlayButton(
+                onTap: () {}, child: const Text('elevated material')),
+          ),
         ],
       ),
     );
