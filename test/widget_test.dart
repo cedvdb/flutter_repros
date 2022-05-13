@@ -16,7 +16,9 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('dropdown')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('option-hello')));
+    await tester
+        .ensureVisible(find.byKey(const ValueKey('option-hello')).first);
+    await tester.tap(find.byKey(const ValueKey('option-hello')).first);
     await tester.pumpAndSettle();
   });
 }
