@@ -3,7 +3,7 @@ import 'package:flutter_repros/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import '../../utils/add.dart';
+import 'add.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
