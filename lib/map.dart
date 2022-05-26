@@ -1,17 +1,15 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 typedef OnPositionUpdated = void Function(LatLng newPosition);
 
 class MapLocationPicker extends StatefulWidget {
-  final LatLng? initialPosition;
-  final OnPositionUpdated? onPositionUpdated;
-  final bool readOnly;
+  final LatLng initialPosition;
 
-  const MapLocationPicker({
-    this.initialPosition,
-    this.onPositionUpdated,
-    this.readOnly = true,
+  MapLocationPicker({
+    required this.initialPosition,
     Key? key,
   }) : super(key: key);
 
@@ -20,72 +18,61 @@ class MapLocationPicker extends StatefulWidget {
 }
 
 class _MapLocationPickerState extends State<MapLocationPicker> {
-  final String _pickedLocationMarkerId = "pickedLocation";
-
-  final _defaultPosition = const CameraPosition(
-    target: LatLng(41.99, 21.42),
-    zoom: 7.2373,
-  );
-
-  final double _defaultPickedLocationZoom = 14.4746;
-
-  LatLng? _position;
+  late CameraPosition initialCameraPosition;
 
   @override
-  void initState() {
-    super.initState();
-
-    _position = initialPosition;
-  }
-
-  void _updatePosition(LatLng newPosition) {
-    if (readOnly) {
-      return;
-    }
-
-    onPositionUpdated?.call(newPosition);
-
-    if (mounted) {
-      setState(() {
-        _position = newPosition;
-      });
-    }
-  }
-
-  Set<Marker> _getMarkers() {
-    return {
-      if (_position != null)
-        Marker(
-          draggable: !readOnly,
-          onDragEnd: _updatePosition,
-          markerId: MarkerId(_pickedLocationMarkerId),
-          position: _position!,
-          infoWindow: InfoWindow(
-            title: "${_position!.latitude}, ${_position!.longitude}",
-          ),
-        ),
-    };
+  void didChangeDependencies() {
+    initialCameraPosition = _computeCameraPosition();
+    super.didChangeDependencies();
   }
 
   void _onMapCreated(GoogleMapController controller) {
     controller.setMapStyle(null);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return GoogleMap(
-      initialCameraPosition: _defaultPosition,
-      onMapCreated: _onMapCreated,
-      markers: _getMarkers(),
-      onTap: (LatLng? location) {
-        if (!readOnly && _position == null && location != null) {
-          _updatePosition(location);
-        }
-      },
+  CameraPosition _computeCameraPosition() {
+    final initialCenter = LatLng(
+      widget.initialPosition.latitude,
+      widget.initialPosition.longitude,
+    );
+    final zoom = _computeZoomForScreenSize();
+    return CameraPosition(
+      target: initialCenter,
+      zoom: zoom,
     );
   }
 
-  LatLng? get initialPosition => widget.initialPosition;
-  OnPositionUpdated? get onPositionUpdated => widget.onPositionUpdated;
-  bool get readOnly => widget.readOnly;
+  double _computeZoomForScreenSize() {
+    final screenSize = MediaQuery.of(context).size;
+    final minSize = min(screenSize.width, screenSize.height);
+    return _computeZoom(
+      screenSize: minSize,
+      latitude: widget.initialPosition.latitude,
+      distanceMeters: 4000,
+    );
+  }
+
+  double _computeZoom({
+    required double screenSize,
+    required double latitude,
+    required double distanceMeters,
+  }) {
+    //https://stackoverflow.com/a/54704665/4299560
+    const equatorLength = 40075004;
+
+    final latitudinalAdjustment = cos(pi * latitude / 180.0);
+    final arg = equatorLength *
+        screenSize *
+        latitudinalAdjustment /
+        (distanceMeters * 256);
+    return log(arg) / log(2.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GoogleMap(
+      initialCameraPosition: initialCameraPosition,
+      onMapCreated: _onMapCreated,
+    );
+  }
 }

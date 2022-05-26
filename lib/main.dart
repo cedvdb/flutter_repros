@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'map.dart';
 
@@ -60,7 +61,16 @@ class _MyHomePageState extends State<MyHomePage>
           Container(
             color: Colors.blue,
           ),
-          const MapLocationPicker(),
+          LayoutBuilder(builder: (ctx, constraints) {
+            if (constraints.maxWidth < 500) {
+              return MapLocationPicker(
+                initialPosition: LatLng(48.8566, 2.35),
+              );
+            }
+            return MapLocationPicker(
+              initialPosition: LatLng(48.8566, 2.36),
+            );
+          }),
         ],
       ),
     );
