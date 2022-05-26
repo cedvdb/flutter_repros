@@ -25,17 +25,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: DropdownButtonFormField<String>(
-        key: const ValueKey('dropdown'),
-        items: const [
-          DropdownMenuItem(
-            key: ValueKey('option-hello'),
-            child: Text('hello'),
-            value: 'hello',
-          ),
-        ],
-        onChanged: (_) {},
-      ),
+      body: Container(),
     );
   }
 }
