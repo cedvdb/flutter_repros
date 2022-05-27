@@ -5,19 +5,19 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 typedef OnPositionUpdated = void Function(LatLng newPosition);
 
-class MapLocationPicker extends StatefulWidget {
+class MyMap extends StatefulWidget {
   final LatLng initialPosition;
 
-  MapLocationPicker({
+  const MyMap({
     required this.initialPosition,
     Key? key,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _MapLocationPickerState();
+  State<StatefulWidget> createState() => _MyMapState();
 }
 
-class _MapLocationPickerState extends State<MapLocationPicker> {
+class _MyMapState extends State<MyMap> {
   late CameraPosition initialCameraPosition;
 
   @override

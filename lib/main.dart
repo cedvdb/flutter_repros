@@ -22,55 +22,42 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    _tabController = TabController(length: 3, vsync: this);
-    super.initState();
+  void _openDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Column(
+          children: [
+            ElevatedButton(onPressed: () {}, child: const Text('press me too'))
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.directions_car)),
-            Tab(icon: Icon(Icons.directions_transit)),
-            Tab(icon: Icon(Icons.directions_bike)),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Stack(
         children: [
-          Container(
-            color: Colors.green,
+          const MyMap(
+            initialPosition: LatLng(48.8566, 2.35),
           ),
-          Container(
-            color: Colors.blue,
+          Positioned(
+            child: ElevatedButton(
+              onPressed: () => print('clicked'),
+              child: const Text('clicked'),
+            ),
           ),
-          LayoutBuilder(builder: (ctx, constraints) {
-            if (constraints.maxWidth < 500) {
-              return MapLocationPicker(
-                initialPosition: LatLng(48.8566, 2.35),
-              );
-            }
-            return MapLocationPicker(
-              initialPosition: LatLng(48.8566, 2.36),
-            );
-          }),
+          Positioned(
+            child: ElevatedButton(
+              onPressed: () => _openDialog(context),
+              child: const Text('click me'),
+            ),
+          )
         ],
       ),
     );
