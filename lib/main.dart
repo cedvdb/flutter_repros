@@ -27,8 +27,8 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar.medium(
-            title: const Text('example'),
+          const SliverAppBar(
+            title: Text('example'),
           )
         ],
         body: Row(
