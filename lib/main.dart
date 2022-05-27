@@ -25,7 +25,44 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar.medium(
+            title: const Text('example'),
+          )
+        ],
+        body: Row(
+          children: [
+            SizedBox(
+              width: 500,
+              child: ListView.builder(
+                itemCount: 30,
+                itemBuilder: (context, index) => ListTile(
+                  title: Text('tile $index'),
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(height: 500, color: Colors.yellow),
+                    Container(height: 500, color: Colors.orange),
+                    Container(height: 500, color: Colors.blue),
+                    Container(height: 500, color: Colors.yellow),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
