@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_repros/router.dart';
+import 'package:flutter_repros/explore_view.dart';
 
 void main() {
   runApp(const MyApp());
+  FlutterError.onError = (details) => print(details);
 }
 
 class MyApp extends StatelessWidget {
@@ -10,14 +11,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      routerDelegate: router.delegate,
-      routeInformationParser: router.informationParser,
-      routeInformationProvider: router.informationProvider,
+      home: const ExploreView(),
     );
   }
 }
