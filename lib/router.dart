@@ -1,5 +1,4 @@
-import 'dart:collection';
-
+import 'package:flutter_repros/change_location_view.dart';
 import 'package:flutter_repros/explore_view.dart';
 import 'package:x_router/x_router.dart';
 
@@ -15,6 +14,10 @@ final routes = [
           path: Routes.map,
           builder: (context, activatedRoute) => const ExploreView(),
         ),
+        XRoute(
+          path: Routes.changeLocation,
+          builder: (context, activatedRoute) => const ChangeLocationView(),
+        ),
       ],
     ),
   ),
@@ -28,4 +31,5 @@ final router = XRouter(
 abstract class Routes {
   static const app = '/app';
   static const map = '$app/map';
+  static const changeLocation = '$app/change_location';
 }
