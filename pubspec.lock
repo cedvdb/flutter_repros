@@ -50,6 +50,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -155,7 +162,7 @@ packages:
       name: material_color_utilities
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.4"
+    version: "0.1.5"
   meta:
     dependency: transitive
     description:
@@ -252,6 +259,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  x_router:
+    dependency: "direct main"
+    description:
+      name: x_router
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.5"
 sdks:
   dart: ">=2.17.0-0 <3.0.0"
-  flutter: ">=2.5.0"
+  flutter: ">=3.0.0"
