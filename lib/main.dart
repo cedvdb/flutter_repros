@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_repros/sync_duo_scroll_controllers.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,34 +20,61 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  SyncDuoScrollControllers controllers = SyncDuoScrollControllers()..link();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          const SliverAppBar(
-            title: Text('example'),
+          SliverAppBar.medium(
+            title: const Text('example'),
           )
         ],
-        body: Row(
-          children: [
-            SizedBox(
-              width: 500,
-              child: ListView.builder(
-                itemCount: 30,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text('tile $index'),
+        body: SingleChildScrollView(
+          child: Row(
+            children: [
+              SizedBox(
+                width: 500,
+                child: CustomScrollView(
+                  slivers: [
+                    SliverFixedExtentList(
+                      itemExtent: 60,
+                      delegate: SliverChildBuilderDelegate(
+                          (context, index) => ListTile(
+                                title: Text('tile $index'),
+                              ),
+                          childCount: 10),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('secon list'),
+                      ),
+                    ),
+                    SliverFixedExtentList(
+                      itemExtent: 60,
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => ListTile(
+                          title: Text('tile $index'),
+                        ),
+                        childCount: 10,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
+              const SizedBox(
+                width: 20,
+              ),
+              Expanded(
                 child: Column(
                   children: [
                     Container(height: 500, color: Colors.yellow),
@@ -56,11 +84,11 @@ class MyHomePage extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-          ],
+              const SizedBox(
+                width: 20,
+              ),
+            ],
+          ),
         ),
       ),
     );
