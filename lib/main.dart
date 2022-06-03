@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_repros/sync_duo_scroll_controllers.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,67 +27,94 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  SyncDuoScrollControllers controllers = SyncDuoScrollControllers()..link();
+  ScrollController left = ScrollController();
+  ScrollController right = ScrollController();
+  ScrollController group = ScrollController();
+
+  @override
+  void initState() {
+    group.addListener(() {
+      print('scroll');
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
+        controller: group,
+        physics: const NeverScrollableScrollPhysics(),
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar.medium(
             title: const Text('example'),
           )
         ],
-        body: SingleChildScrollView(
-          child: Row(
-            children: [
-              SizedBox(
-                width: 500,
-                child: CustomScrollView(
-                  slivers: [
-                    SliverFixedExtentList(
-                      itemExtent: 60,
-                      delegate: SliverChildBuilderDelegate(
-                          (context, index) => ListTile(
-                                title: Text('tile $index'),
-                              ),
-                          childCount: 10),
-                    ),
-                    const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('secon list'),
-                      ),
-                    ),
-                    SliverFixedExtentList(
-                      itemExtent: 60,
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => ListTile(
-                          title: Text('tile $index'),
+        body: Scrollable(
+          controller: group,
+          viewportBuilder: (context, offset) {
+            return ScrollConfiguration(
+              behavior:
+                  ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 500,
+                    child: CustomScrollView(
+                      controller: left,
+                      physics: const NeverScrollableScrollPhysics(),
+                      slivers: [
+                        SliverFixedExtentList(
+                          itemExtent: 60,
+                          delegate: SliverChildBuilderDelegate(
+                              (context, index) => ListTile(
+                                    title: Text('tile $index'),
+                                  ),
+                              childCount: 10),
                         ),
-                        childCount: 10,
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('secon list'),
+                          ),
+                        ),
+                        SliverFixedExtentList(
+                          itemExtent: 60,
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => ListTile(
+                              title: Text('tile $index'),
+                            ),
+                            childCount: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: right,
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          Container(height: 500, color: Colors.yellow),
+                          Container(height: 500, color: Colors.orange),
+                          Container(height: 500, color: Colors.blue),
+                          Container(height: 500, color: Colors.yellow),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                ],
               ),
-              const SizedBox(
-                width: 20,
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    Container(height: 500, color: Colors.yellow),
-                    Container(height: 500, color: Colors.orange),
-                    Container(height: 500, color: Colors.blue),
-                    Container(height: 500, color: Colors.yellow),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
