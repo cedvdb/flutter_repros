@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_repros/discount_table_field.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +26,9 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(),
+      body: Container(
+        child: DiscountTableField(initialValue: []),
+      ),
     );
   }
 }
