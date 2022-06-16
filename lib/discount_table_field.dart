@@ -39,7 +39,7 @@ class DiscountItem {
 
 class DiscountTableField extends StatefulWidget {
   final DiscountList initialValue;
-  final ValueChanged<List<DiscountEntry>> onChange;
+  final ValueChanged<DiscountList> onChange;
 
   const DiscountTableField({
     Key? key,
@@ -69,6 +69,14 @@ class _DiscountTableFieldState extends State<DiscountTableField> {
   }
 
   void _onChange() {
+    final entries = _items
+        .where((item) => item.isValid)
+        .map((item) =>
+            DiscountEntry(minDays: item.minDays!, discount: item.discount!))
+        .toList();
+
+    widget.onChange(DiscountList(entries));
+
     if (_items.isEmpty || (_items.last.isValid && _items.last.isNotMax)) {
       setState(() => _items.add(DiscountItem.empty()));
     }
@@ -148,38 +156,34 @@ class _DiscountTableFieldState extends State<DiscountTableField> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        DataTable(
-          columns: const [
-            DataColumn(label: Text('min days')),
-            DataColumn(label: Text('discount')),
-            DataColumn(label: SizedBox(width: 24)),
-          ],
-          rows: [
-            for (final item in _items)
-              DataRow(
-                cells: [
-                  DataCell(
-                    onTap: () => _showDaysPicker(context, item),
-                    Text((item.minDays ?? '-').toString()),
-                  ),
-                  DataCell(
-                    onTap: () => _showDiscountPicker(context, item),
-                    Text((item.discount ?? '-').toString()),
-                  ),
-                  DataCell(
-                    item.isValid
-                        ? IconButton(
-                            onPressed: () => _remove(item),
-                            icon: const Icon(Icons.close, size: 16),
-                          )
-                        : Container(),
-                  ),
-                ],
+    return DataTable(
+      columns: const [
+        DataColumn(label: Text('min days')),
+        DataColumn(label: Text('discount')),
+        DataColumn(label: SizedBox(width: 24)),
+      ],
+      rows: [
+        for (final item in _items)
+          DataRow(
+            cells: [
+              DataCell(
+                onTap: () => _showDaysPicker(context, item),
+                Text((item.minDays ?? '-').toString()),
               ),
-          ],
-        ),
+              DataCell(
+                onTap: () => _showDiscountPicker(context, item),
+                Text((item.discount ?? '-').toString()),
+              ),
+              DataCell(
+                item.isValid
+                    ? IconButton(
+                        onPressed: () => _remove(item),
+                        icon: const Icon(Icons.close, size: 16),
+                      )
+                    : Container(),
+              ),
+            ],
+          ),
       ],
     );
   }
@@ -234,11 +238,13 @@ class _NumberStepperFieldState extends State<NumberStepperField> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
+          key: const ValueKey('decrease-button'),
           onPressed: _value == widget.min ? null : _substract,
           icon: const Icon(Icons.remove),
         ),
         Text(_value.toString()),
         IconButton(
+          key: const ValueKey('increase-button'),
           onPressed: _value == widget.max ? null : _add,
           icon: const Icon(Icons.add),
         ),
