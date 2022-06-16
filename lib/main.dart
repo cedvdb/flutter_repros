@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_repros/discount_list.dart';
 import 'package:flutter_repros/discount_table_field.dart';
 
 void main() {
@@ -28,7 +29,7 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: DiscountTableField(
-          initialValue: const [],
+          initialValue: DiscountList(),
           onChange: (value) {},
         ),
       ),

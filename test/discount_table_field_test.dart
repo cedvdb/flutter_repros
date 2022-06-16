@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_repros/discount_entry.dart';
+import 'package:flutter_repros/discount_list.dart';
 import 'package:flutter_repros/discount_table_field.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget buildDiscountTable({
-  required List<DiscountEntry> initialValue,
+  required DiscountList initialValue,
   required ValueChanged<List<DiscountEntry>> onChange,
 }) =>
     MaterialApp(
@@ -23,7 +24,7 @@ void main() {
       late List<DiscountEntry> entries;
       await tester.pumpWidget(
         buildDiscountTable(
-          initialValue: [],
+          initialValue: DiscountList([]),
           onChange: (newEntries) => entries = newEntries,
         ),
       );
@@ -63,7 +64,7 @@ void main() {
       late List<DiscountEntry> entries;
       await tester.pumpWidget(
         buildDiscountTable(
-          initialValue: [],
+          initialValue: DiscountList([]),
           onChange: (newEntries) => entries = newEntries,
         ),
       );
@@ -92,19 +93,72 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         buildDiscountTable(
-          initialValue: [
-            DiscountEntry(minDays: 5, discount: 5),
-            DiscountEntry(minDays: 10, discount: 15),
-          ],
+          initialValue: DiscountList([
+            DiscountEntry(minDays: 5, discount: 10),
+            DiscountEntry(minDays: 15, discount: 20),
+          ]),
           onChange: (newEntries) {},
         ),
       );
+
+      expect(find.byType(DataRow), findsNWidgets(3));
+      expect(find.text('-'), findsNWidgets(2));
+      expect(find.text('5'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('15'), findsOneWidget);
+      expect(find.text('20'), findsOneWidget);
     });
 
-    testWidgets('Should be able to remove an entry', (tester) async {});
+    testWidgets('Should be able to remove an entry', (tester) async {
+      await tester.pumpWidget(
+        buildDiscountTable(
+          initialValue: DiscountList([
+            DiscountEntry(minDays: 5, discount: 10),
+            DiscountEntry(minDays: 15, discount: 20),
+          ]),
+          onChange: (newEntries) {},
+        ),
+      );
+      expect(find.byType(DataRow), findsNWidgets(3));
+      await tester.tap(find.byIcon(Icons.delete).first);
+      await tester.pumpAndSettle();
+      expect(find.byType(DataRow), findsNWidgets(2));
+    });
 
-    testWidgets('Should be able to edit an entry', (tester) async {});
+    testWidgets('Should be able to edit an entry', (tester) async {
+      await tester.pumpWidget(
+        buildDiscountTable(
+          initialValue: DiscountList([
+            DiscountEntry(minDays: 5, discount: 20),
+          ]),
+          onChange: (newEntries) {},
+        ),
+      );
+      await tester.tap(find.text('5'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.tap(find.text('done'));
+      expect(find.text('5'), findsNothing);
+      expect(find.text('10'), findsOneWidget);
+    });
 
-    testWidgets('should not be able to go above 100 days', (tester) async {});
+    testWidgets(
+        'Should not be able to edit an entry that is locked because of other entries',
+        (tester) async {
+      await tester.pumpWidget(
+        buildDiscountTable(
+          initialValue: DiscountList([
+            // 5 is the minimum and the next item has 10 minDays so we cannot increase to 10 instead too
+            DiscountEntry(minDays: 5, discount: 20),
+            DiscountEntry(minDays: 10, discount: 25),
+          ]),
+          onChange: (newEntries) {},
+        ),
+      );
+      await tester.tap(find.text('5'));
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.add), findsNothing);
+      expect(find.byIcon(Icons.remove), findsNothing);
+    });
   });
 }

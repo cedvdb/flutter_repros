@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 
 class DiscountEntry with EquatableMixin {
+  static const maxDiscount = 50;
+  static const maxMinDays = 100;
+
   // max value eligible for discount
   final int minDays;
   // percentage
@@ -9,8 +12,8 @@ class DiscountEntry with EquatableMixin {
   DiscountEntry({
     required this.minDays,
     required this.discount,
-  })  : assert(0 <= minDays && minDays <= 365),
-        assert(discount >= 0 && discount < 100);
+  })  : assert(0 <= minDays && minDays <= maxMinDays),
+        assert(discount >= 0 && discount < maxDiscount);
 
   bool operator <(DiscountEntry other) {
     return minDays < other.minDays && discount < other.discount;

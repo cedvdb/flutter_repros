@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_repros/discount_entry.dart';
+import 'package:flutter_repros/discount_list.dart';
 
 class DiscountValue {
   int? minDays;
@@ -17,7 +18,7 @@ class DiscountValue {
 }
 
 class DiscountTableField extends StatefulWidget {
-  final List<DiscountEntry> initialValue;
+  final DiscountList initialValue;
   final ValueChanged<List<DiscountEntry>> onChange;
 
   const DiscountTableField({
