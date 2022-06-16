@@ -1,20 +1,40 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_repros/discount_entry.dart';
 import 'package:flutter_repros/discount_list.dart';
+import 'package:flutter_repros/internal/bottom_sheet_form.dart';
+import 'package:flutter_repros/internal/cross_platform.dart';
 
-class DiscountValue {
+class DiscountItem {
   int? minDays;
   int? discount;
 
-  DiscountValue({required this.minDays, required this.discount});
+  DiscountItem({required this.minDays, required this.discount});
 
-  DiscountValue.empty()
+  DiscountItem.empty()
       : minDays = null,
         discount = null;
 
+  DiscountItem.fromEntry(DiscountEntry entry)
+      : minDays = entry.minDays,
+        discount = entry.discount;
+
   bool get isValid => minDays != null && discount != null;
+
+  bool get isEmpty => minDays == null && discount == null;
+  bool get isNotEmpty => !isEmpty;
+
+  bool get isMax =>
+      minDays == DiscountEntry.maxMinDays ||
+      discount == DiscountEntry.maxDiscount;
+
+  bool get isNotMax => !isMax;
+
+  @override
+  String toString() => 'DiscountValue(minDays: $minDays, discount: $discount)';
 }
 
 class DiscountTableField extends StatefulWidget {
@@ -32,41 +52,98 @@ class DiscountTableField extends StatefulWidget {
 }
 
 class _DiscountTableFieldState extends State<DiscountTableField> {
-  List<DiscountEntry> entries = [];
-  DiscountValue nextEntry = DiscountValue.empty();
+  static const step = 5;
+  List<DiscountItem> _items = [];
 
   @override
   void initState() {
-    entries = widget.initialValue;
+    _items = widget.initialValue.map(DiscountItem.fromEntry).toList();
+    _items.add(DiscountItem.empty());
     super.initState();
   }
 
-  void _showDaysPicker(BuildContext context) {
-    const min = 5;
-    setState(() => nextEntry.minDays = min);
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      builder: (ctx) => NumberStepperField(
-        max: 100,
-        min: min,
-        onChange: (value) => setState(() => nextEntry.minDays = value),
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+    _onChange();
+  }
+
+  void _onChange() {
+    if (_items.isEmpty || (_items.last.isValid && _items.last.isNotMax)) {
+      setState(() => _items.add(DiscountItem.empty()));
+    }
+  }
+
+  void _showDaysPicker(BuildContext context, DiscountItem item) {
+    final itemIndex = _items.indexOf(item);
+    final isFirstItem = itemIndex == 0;
+    final isLastItem = itemIndex == _items.length - 1;
+    final previousItem = isFirstItem ? null : _items[itemIndex - 1];
+    final nextItem = isLastItem ? null : _items[itemIndex + 1];
+    // the minimum is a step above the previous item
+    var min = step;
+    if (!isFirstItem) {
+      min = previousItem!.minDays! + step;
+    }
+    // the maximum is a step below the next item
+    var max = DiscountEntry.maxMinDays;
+    if (!isLastItem && nextItem!.minDays != null) {
+      max = (nextItem.minDays! - step);
+    }
+    int newValue = min;
+    CrossPlatform.showBottomSheet(
+      context,
+      (ctx) => BottomSheetForm(
+        title: 'Min days',
+        onSubmit: () => setState(() => item.minDays = newValue),
+        child: NumberStepperField(
+          initialValue: item.minDays,
+          min: min,
+          max: max,
+          onChange: (newMinDays) => newValue = newMinDays,
+        ),
       ),
     );
   }
 
-  void _showDiscountPicker(BuildContext context) {
-    const min = 5;
-    setState(() => nextEntry.discount = min);
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      builder: (ctx) => NumberStepperField(
-        max: 50,
-        min: min,
-        onChange: (value) => setState(() => nextEntry.discount = value),
+  void _showDiscountPicker(BuildContext context, DiscountItem item) {
+    final itemIndex = _items.indexOf(item);
+    final isFirstItem = itemIndex == 0;
+    final isLastItem = itemIndex == _items.length - 1;
+    final previousItem = isFirstItem ? null : _items[itemIndex - 1];
+    final nextItem = isLastItem ? null : _items[itemIndex + 1];
+    // the minimum is a step above the previous item
+    var min = step;
+    if (!isFirstItem) {
+      min = previousItem!.discount! + step;
+    }
+    // the maximum is a step below the next item
+    var max = DiscountEntry.maxDiscount;
+    if (!isLastItem && nextItem!.discount != null) {
+      max = (nextItem.discount! - step);
+    }
+    int newValue = min;
+
+    // if there is no value for min days we set the min    setState(() => value.discount ??= min);
+    CrossPlatform.showBottomSheet(
+      context,
+      (ctx) => BottomSheetForm(
+        title: 'Discount (%)',
+        onSubmit: () => setState(() => item.discount = newValue),
+        child: NumberStepperField(
+          initialValue: item.discount,
+          min: min,
+          max: max,
+          onChange: (newDiscount) => newValue = newDiscount,
+        ),
       ),
     );
+  }
+
+  void _remove(DiscountItem item) {
+    setState(() {
+      _items.remove(item);
+    });
   }
 
   @override
@@ -77,31 +154,30 @@ class _DiscountTableFieldState extends State<DiscountTableField> {
           columns: const [
             DataColumn(label: Text('min days')),
             DataColumn(label: Text('discount')),
+            DataColumn(label: SizedBox(width: 24)),
           ],
           rows: [
-            for (final entry in entries)
+            for (final item in _items)
               DataRow(
                 cells: [
                   DataCell(
-                    Text(entry.minDays.toString()),
+                    onTap: () => _showDaysPicker(context, item),
+                    Text((item.minDays ?? '-').toString()),
                   ),
                   DataCell(
-                    Text(entry.discount.toString()),
+                    onTap: () => _showDiscountPicker(context, item),
+                    Text((item.discount ?? '-').toString()),
+                  ),
+                  DataCell(
+                    item.isValid
+                        ? IconButton(
+                            onPressed: () => _remove(item),
+                            icon: const Icon(Icons.close, size: 16),
+                          )
+                        : Container(),
                   ),
                 ],
               ),
-            DataRow(
-              cells: [
-                DataCell(
-                  Text((nextEntry.minDays ?? '-').toString()),
-                  onTap: () => _showDaysPicker(context),
-                ),
-                DataCell(
-                  Text((nextEntry.discount ?? '-').toString()),
-                  onTap: () => _showDiscountPicker(context),
-                ),
-              ],
-            )
           ],
         ),
       ],
@@ -113,6 +189,7 @@ class NumberStepperField extends StatefulWidget {
   final int max;
   final int min;
   final int step;
+  final int? initialValue;
   final ValueChanged<int> onChange;
 
   const NumberStepperField({
@@ -120,6 +197,7 @@ class NumberStepperField extends StatefulWidget {
     required this.min,
     required this.max,
     required this.onChange,
+    required this.initialValue,
     this.step = 5,
   }) : super(key: key);
 
@@ -132,7 +210,7 @@ class _NumberStepperFieldState extends State<NumberStepperField> {
 
   @override
   void initState() {
-    _value = widget.min;
+    _value = widget.initialValue ?? widget.min;
     super.initState();
   }
 
@@ -156,12 +234,12 @@ class _NumberStepperFieldState extends State<NumberStepperField> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
-          onPressed: _substract,
+          onPressed: _value == widget.min ? null : _substract,
           icon: const Icon(Icons.remove),
         ),
         Text(_value.toString()),
         IconButton(
-          onPressed: _add,
+          onPressed: _value == widget.max ? null : _add,
           icon: const Icon(Icons.add),
         ),
       ],

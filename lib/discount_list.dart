@@ -12,8 +12,7 @@ class DiscountList
   @override
   set length(int length) => _entries.length = length;
 
-  DiscountList([List<DiscountEntry> entries = const []])
-      : assert(entries.length <= 5) {
+  DiscountList([List<DiscountEntry> entries = const []]) {
     for (var entry in entries) {
       _entries.add(entry);
     }
