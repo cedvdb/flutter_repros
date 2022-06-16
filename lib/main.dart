@@ -26,8 +26,11 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: DiscountTableField(initialValue: []),
+      body: Center(
+        child: DiscountTableField(
+          initialValue: const [],
+          onChange: (value) {},
+        ),
       ),
     );
   }

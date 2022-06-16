@@ -18,10 +18,12 @@ class DiscountValue {
 
 class DiscountTableField extends StatefulWidget {
   final List<DiscountEntry> initialValue;
+  final ValueChanged<List<DiscountEntry>> onChange;
 
   const DiscountTableField({
     Key? key,
     required this.initialValue,
+    required this.onChange,
   }) : super(key: key);
 
   @override
@@ -80,7 +82,7 @@ class _DiscountTableFieldState extends State<DiscountTableField> {
               DataRow(
                 cells: [
                   DataCell(
-                    Text(entry.maxValue.toString()),
+                    Text(entry.minDays.toString()),
                   ),
                   DataCell(
                     Text(entry.discount.toString()),
